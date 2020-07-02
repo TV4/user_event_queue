@@ -1,6 +1,4 @@
-defmodule SingulaQueue.AccountUser do
-  @derive Jason.Encoder
-
+defmodule UserEvent.User do
   defstruct [
     :accepted_cmore_terms,
     :accepted_fotbollskanalen_terms,
@@ -32,8 +30,8 @@ defmodule SingulaQueue.AccountUser do
     end)
   end
 
-  def to_user_map(%__MODULE__{} = account_user) do
-    account_user
+  def to_user_map(%__MODULE__{} = user) do
+    user
     |> Map.from_struct()
     |> Enum.reject(fn {_key, value} -> is_nil(value) end)
     |> Map.new()

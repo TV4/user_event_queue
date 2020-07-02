@@ -1,7 +1,7 @@
-defmodule SingulaQueue do
+defmodule UserEventQueue do
   require Logger
 
-  alias SingulaQueue.{AccountUser, AccountUserEvent}
+  alias UserEvent.{User, Event}
 
   @callback attributes() :: map()
   def attributes() do
@@ -21,20 +21,20 @@ defmodule SingulaQueue do
     end
   end
 
-  @callback enqueue(atom(), String.t(), AccountUser.t()) :: :ok
-  def enqueue(event, group_by, account_user) do
-    event = %AccountUserEvent{type: event, data: AccountUser.to_user_map(account_user)}
+  @callback enqueue(event :: atom(), group_by :: binary, User.t()) :: :ok
+  def enqueue(event, group_by, user) do
+    event = %Event{type: event, data: User.to_user_map(user)}
 
     message =
       ExAws.SQS.send_message(queue_url(), Jason.encode!(event), message_group_id: group_by)
 
     with {:ok, %{status_code: 200}} <- ExAws.request(message, config()) do
-      Logger.info("count#singula_import_queue.enqueue.count=1")
+      Logger.info("count#user_event_queue.enqueue.count=1")
       :ok
     end
   end
 
-  @callback poll :: [%AccountUserEvent{data: %AccountUser{}}] | nil
+  @callback poll :: [%Event{data: %User{}}] | nil
   def poll() do
     message =
       ExAws.SQS.receive_message(
@@ -47,7 +47,7 @@ defmodule SingulaQueue do
       message_count = length(sqs_messages)
 
       if message_count > 0 do
-        Logger.info("count#singula_import_queue.poll.count=#{message_count}")
+        Logger.info("count#user_event_queue.poll.count=#{message_count}")
       end
 
       to_user_events(sqs_messages)
@@ -65,9 +65,9 @@ defmodule SingulaQueue do
                    } ->
       case Jason.decode(body) do
         {:ok, %{"type" => type, "data" => data}} ->
-          %AccountUserEvent{
+          %Event{
             type: String.to_atom(type),
-            data: AccountUser.parse(data),
+            data: User.parse(data),
             receipt_handle: receipt_handle,
             message_group_id: message_group_id
           }
@@ -84,22 +84,22 @@ defmodule SingulaQueue do
     message = ExAws.SQS.delete_message(queue_url(), receipt_handle)
 
     with {:ok, %{status_code: 200}} <- ExAws.request(message, config()) do
-      Logger.info("count#singula_import_queue.delete.count=1")
+      Logger.info("count#user_event_queue.delete.count=1")
       :ok
     end
   end
 
-  defp queue_url, do: Application.get_env(:singula_queue, :singula_queue_url)
+  defp queue_url, do: Application.get_env(:user_event_queue, :queue_url)
 
-  defp dlq_url, do: Application.get_env(:singula_queue, :singula_dlq_url)
+  defp dlq_url, do: Application.get_env(:user_event_queue, :dlq_url)
 
   defp config do
     [
-      http_client: Application.get_env(:singula_queue, :http_client, HTTPoison),
+      http_client: Application.get_env(:user_event_queue, :http_client, HTTPoison),
       json_codec: Jason,
-      access_key_id: Application.get_env(:singula_queue, :queue_access_key_id),
-      secret_access_key: Application.get_env(:singula_queue, :queue_secret_access_key),
-      region: Application.get_env(:singula_queue, :queue_region)
+      access_key_id: Application.get_env(:user_event_queue, :access_key_id),
+      secret_access_key: Application.get_env(:user_event_queue, :secret_access_key),
+      region: Application.get_env(:user_event_queue, :region)
     ]
   end
 end

@@ -1,13 +1,13 @@
-defmodule SingulaQueueTest do
+defmodule UserEventQueueTest do
   use ExUnit.Case
   import ExUnit.CaptureLog
   import Mox
 
-  alias SingulaQueue.{AccountUser, AccountUserEvent}
+  alias UserEvent.{User, Event}
 
   setup :verify_on_exit!
 
-  @account_user %AccountUser{
+  @user %User{
     user_id: "123",
     username: "username",
     email: "user@host.com",
@@ -24,12 +24,6 @@ defmodule SingulaQueueTest do
     cmore_newsletter: false
   }
 
-  setup do
-    level = Logger.level()
-    Logger.configure(level: :info)
-    on_exit(fn -> Logger.configure(level: level) end)
-  end
-
   test "enqueue create user message" do
     MockHTTPClient
     |> expect(:request, fn :post,
@@ -39,7 +33,26 @@ defmodule SingulaQueueTest do
                            _http_opts ->
       assert URI.decode_query(body) == %{
                "Action" => "SendMessage",
-               "MessageBody" => Jason.encode!(%{type: "create", data: @account_user}),
+               "MessageBody" =>
+                 Jason.encode!(%{
+                   type: "create",
+                   data: %{
+                     "accepted_cmore_terms" => "2018-08-08",
+                     "accepted_fotbollskanalen_terms" => "2012-12-12",
+                     "accepted_play_terms" => "2019-10-16",
+                     "cmore_newsletter" => false,
+                     "country_code" => "SWE",
+                     "email" => "user@host.com",
+                     "first_name" => "user",
+                     "generic_ads" => false,
+                     "last_name" => "test",
+                     "no_ads" => false,
+                     "user_id" => "123",
+                     "username" => "username",
+                     "year_of_birth" => 1990,
+                     "zip_code" => "12345"
+                   }
+                 }),
                "MessageGroupId" => "123",
                "QueueUrl" =>
                  "https://sqs.eu-central-1.amazonaws.com/123456789012/PaywizardQueue.fifo"
@@ -60,8 +73,8 @@ defmodule SingulaQueueTest do
     end)
 
     assert capture_log(fn ->
-             assert SingulaQueue.enqueue(:create, "123", @account_user) == :ok
-           end) =~ "count#singula_import_queue.enqueue.count=1"
+             assert UserEventQueue.enqueue(:create, "123", @user) == :ok
+           end) =~ "count#user_event_queue.enqueue.count=1"
   end
 
   test "enqueue update user message" do
@@ -73,7 +86,26 @@ defmodule SingulaQueueTest do
                            _http_opts ->
       assert URI.decode_query(body) == %{
                "Action" => "SendMessage",
-               "MessageBody" => Jason.encode!(%{type: "update", data: @account_user}),
+               "MessageBody" =>
+                 Jason.encode!(%{
+                   type: "update",
+                   data: %{
+                     "accepted_cmore_terms" => "2018-08-08",
+                     "accepted_fotbollskanalen_terms" => "2012-12-12",
+                     "accepted_play_terms" => "2019-10-16",
+                     "cmore_newsletter" => false,
+                     "country_code" => "SWE",
+                     "email" => "user@host.com",
+                     "first_name" => "user",
+                     "generic_ads" => false,
+                     "last_name" => "test",
+                     "no_ads" => false,
+                     "user_id" => "123",
+                     "username" => "username",
+                     "year_of_birth" => 1990,
+                     "zip_code" => "12345"
+                   }
+                 }),
                "MessageGroupId" => "123",
                "QueueUrl" =>
                  "https://sqs.eu-central-1.amazonaws.com/123456789012/PaywizardQueue.fifo"
@@ -94,8 +126,8 @@ defmodule SingulaQueueTest do
     end)
 
     assert capture_log(fn ->
-             assert SingulaQueue.enqueue(:update, "123", @account_user) == :ok
-           end) =~ "count#singula_import_queue.enqueue.count=1"
+             assert UserEventQueue.enqueue(:update, "123", @user) == :ok
+           end) =~ "count#user_event_queue.enqueue.count=1"
   end
 
   test "enqueue delete user message" do
@@ -128,8 +160,8 @@ defmodule SingulaQueueTest do
     end)
 
     assert capture_log(fn ->
-             assert SingulaQueue.enqueue(:delete, "123", %AccountUser{user_id: "123"}) == :ok
-           end) =~ "count#singula_import_queue.enqueue.count=1"
+             assert UserEventQueue.enqueue(:delete, "123", %User{user_id: "123"}) == :ok
+           end) =~ "count#user_event_queue.enqueue.count=1"
   end
 
   describe "poll" do
@@ -162,7 +194,7 @@ defmodule SingulaQueueTest do
          }}
       end)
 
-      assert SingulaQueue.poll() == []
+      assert UserEventQueue.poll() == []
     end
 
     test "with a create message" do
@@ -195,11 +227,11 @@ defmodule SingulaQueueTest do
       end)
 
       assert capture_log(fn ->
-               assert SingulaQueue.poll() == [
-                        %AccountUserEvent{
+               assert UserEventQueue.poll() == [
+                        %Event{
                           type: :create,
                           message_group_id: 1234,
-                          data: %AccountUser{
+                          data: %User{
                             accepted_cmore_terms: "2018-08-08",
                             accepted_fotbollskanalen_terms: "2012-12-12",
                             accepted_play_terms: "2019-10-16",
@@ -219,7 +251,7 @@ defmodule SingulaQueueTest do
                             "AQEBdj8hI0xLQzPUAz8gIbJm7yj/jZPU0A84EaWKq9xekGvW+JwCYVOgfJnJNU9iKPEIecLyrlkzC10g7bZQp64ybmuRkPMF2BEpBwz8wUm/oKUCnQFNddEGFg+B/+ZY1yrEGQm5ADHT16uOESh4kQ+2NJH5qTGWj+zrC30KrtAfI0PDXWJ43AVntuX2KorKk7TOYU7Lz5Nw8HkDQVx8ClXveMy7p0xM13274lLjkQcGJam+ztbsQhh6cMAdriqklt1EIowkQAYroHWhKWVJOhxsBm5PG8IvEPIhQ0TuEaLYQ08="
                         }
                       ]
-             end) =~ "count#singula_import_queue.poll.count=1"
+             end) =~ "count#user_event_queue.poll.count=1"
     end
 
     test "with an update message" do
@@ -252,11 +284,11 @@ defmodule SingulaQueueTest do
       end)
 
       assert capture_log(fn ->
-               assert SingulaQueue.poll() == [
-                        %AccountUserEvent{
+               assert UserEventQueue.poll() == [
+                        %Event{
                           type: :update,
                           message_group_id: 1234,
-                          data: %AccountUser{
+                          data: %User{
                             user_id: "1234",
                             username: "username",
                             email: "user@host.com"
@@ -265,7 +297,7 @@ defmodule SingulaQueueTest do
                             "AQEBdj8hI0xLQzPUAz8gIbJm7yj/jZPU0A84EaWKq9xekGvW+JwCYVOgfJnJNU9iKPEIecLyrlkzC10g7bZQp64ybmuRkPMF2BEpBwz8wUm/oKUCnQFNddEGFg+B/+ZY1yrEGQm5ADHT16uOESh4kQ+2NJH5qTGWj+zrC30KrtAfI0PDXWJ43AVntuX2KorKk7TOYU7Lz5Nw8HkDQVx8ClXveMy7p0xM13274lLjkQcGJam+ztbsQhh6cMAdriqklt1EIowkQAYroHWhKWVJOhxsBm5PG8IvEPIhQ0TuEaLYQ08="
                         }
                       ]
-             end) =~ "count#singula_import_queue.poll.count=1"
+             end) =~ "count#user_event_queue.poll.count=1"
     end
 
     test "with a delete message" do
@@ -298,16 +330,16 @@ defmodule SingulaQueueTest do
       end)
 
       assert capture_log(fn ->
-               assert SingulaQueue.poll() == [
-                        %AccountUserEvent{
+               assert UserEventQueue.poll() == [
+                        %Event{
                           type: :delete,
                           message_group_id: 1234,
-                          data: %AccountUser{user_id: "1234"},
+                          data: %User{user_id: "1234"},
                           receipt_handle:
                             "AQEBdj8hI0xLQzPUAz8gIbJm7yj/jZPU0A84EaWKq9xekGvW+JwCYVOgfJnJNU9iKPEIecLyrlkzC10g7bZQp64ybmuRkPMF2BEpBwz8wUm/oKUCnQFNddEGFg+B/+ZY1yrEGQm5ADHT16uOESh4kQ+2NJH5qTGWj+zrC30KrtAfI0PDXWJ43AVntuX2KorKk7TOYU7Lz5Nw8HkDQVx8ClXveMy7p0xM13274lLjkQcGJam+ztbsQhh6cMAdriqklt1EIowkQAYroHWhKWVJOhxsBm5PG8IvEPIhQ0TuEaLYQ08="
                         }
                       ]
-             end) =~ "count#singula_import_queue.poll.count=1"
+             end) =~ "count#user_event_queue.poll.count=1"
     end
 
     test "with a valid and an invalid message" do
@@ -340,9 +372,8 @@ defmodule SingulaQueueTest do
       end)
 
       assert capture_log(fn ->
-               assert SingulaQueue.poll()
-                      |> Enum.count() == 1
-             end) =~ "count#singula_import_queue.poll.count=2"
+               assert UserEventQueue.poll() |> Enum.count() == 1
+             end) =~ "count#user_event_queue.poll.count=2"
     end
   end
 
@@ -376,10 +407,10 @@ defmodule SingulaQueueTest do
     end)
 
     assert capture_log(fn ->
-             assert SingulaQueue.delete(
+             assert UserEventQueue.delete(
                       "AQEBdj8hI0xLQzPUAz8gIbJm7yj/jZPU0A84EaWKq9xekGvW+JwCYVOgfJnJNU9iKPEIecLyrlkzC10g7bZQp64ybmuRkPMF2BEpBwz8wUm/oKUCnQFNddEGFg+B/+ZY1yrEGQm5ADHT16uOESh4kQ+2NJH5qTGWj+zrC30KrtAfI0PDXWJ43AVntuX2KorKk7TOYU7Lz5Nw8HkDQVx8ClXveMy7p0xM13274lLjkQcGJam+ztbsQhh6cMAdriqklt1EIowkQAYroHWhKWVJOhxsBm5PG8IvEPIhQ0TuEaLYQ08="
                     ) == :ok
-           end) =~ "count#singula_import_queue.delete.count=1"
+           end) =~ "count#user_event_queue.delete.count=1"
   end
 
   test "get queue attributes" do
@@ -410,7 +441,7 @@ defmodule SingulaQueueTest do
        }}
     end)
 
-    assert SingulaQueue.attributes() == %{
+    assert UserEventQueue.attributes() == %{
              approximate_number_of_messages: 1,
              approximate_number_of_messages_delayed: 0,
              approximate_number_of_messages_not_visible: 0,
@@ -455,7 +486,7 @@ defmodule SingulaQueueTest do
        }}
     end)
 
-    assert SingulaQueue.dlq_attributes() == %{
+    assert UserEventQueue.dlq_attributes() == %{
              approximate_number_of_messages: 1,
              approximate_number_of_messages_delayed: 0,
              approximate_number_of_messages_not_visible: 0,

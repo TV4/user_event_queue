@@ -20,5 +20,5 @@ erl_crash.dump
 *.ez
 
 # Ignore package tarball (built via "mix hex.build").
-singula_queue-*.tar
+user_event_queue-*.tar
 

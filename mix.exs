@@ -1,9 +1,9 @@
-defmodule SingulaQueue.MixProject do
+defmodule UserEvent.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :singula_queue,
+      app: :user_event_queue,
       version: "0.1.0",
       elixir: "~> 1.10",
       elixirc_paths: elixirc_paths(Mix.env()),
