@@ -1,7 +1,7 @@
 defmodule UserEventQueue do
   require Logger
 
-  alias UserEvent.{User, Event}
+  alias UserEventQueue.{User, Event}
 
   @callback attributes() :: map()
   def attributes() do
@@ -25,8 +25,7 @@ defmodule UserEventQueue do
   def enqueue(event, group_by, user) do
     event = %Event{type: event, data: User.to_user_map(user)}
 
-    message =
-      ExAws.SQS.send_message(queue_url(), Jason.encode!(event), message_group_id: group_by)
+    message = ExAws.SQS.send_message(queue_url(), Jason.encode!(event), message_group_id: group_by)
 
     with {:ok, %{status_code: 200}} <- ExAws.request(message, config()) do
       Logger.info("count#user_event_queue.enqueue.count=1")

@@ -3,7 +3,7 @@ defmodule UserEventQueueTest do
   import ExUnit.CaptureLog
   import Mox
 
-  alias UserEvent.{User, Event}
+  alias UserEventQueue.{User, Event}
 
   setup :verify_on_exit!
 
@@ -26,11 +26,7 @@ defmodule UserEventQueueTest do
 
   test "enqueue create user message" do
     MockHTTPClient
-    |> expect(:request, fn :post,
-                           "https://sqs.eu-central-1.amazonaws.com/",
-                           body,
-                           _headers,
-                           _http_opts ->
+    |> expect(:request, fn :post, "https://sqs.eu-central-1.amazonaws.com/", body, _headers, _http_opts ->
       assert URI.decode_query(body) == %{
                "Action" => "SendMessage",
                "MessageBody" =>
@@ -54,8 +50,7 @@ defmodule UserEventQueueTest do
                    }
                  }),
                "MessageGroupId" => "123",
-               "QueueUrl" =>
-                 "https://sqs.eu-central-1.amazonaws.com/123456789012/PaywizardQueue.fifo"
+               "QueueUrl" => "https://sqs.eu-central-1.amazonaws.com/123456789012/PaywizardQueue.fifo"
              }
 
       {:ok,
@@ -79,11 +74,7 @@ defmodule UserEventQueueTest do
 
   test "enqueue update user message" do
     MockHTTPClient
-    |> expect(:request, fn :post,
-                           "https://sqs.eu-central-1.amazonaws.com/",
-                           body,
-                           _headers,
-                           _http_opts ->
+    |> expect(:request, fn :post, "https://sqs.eu-central-1.amazonaws.com/", body, _headers, _http_opts ->
       assert URI.decode_query(body) == %{
                "Action" => "SendMessage",
                "MessageBody" =>
@@ -107,8 +98,7 @@ defmodule UserEventQueueTest do
                    }
                  }),
                "MessageGroupId" => "123",
-               "QueueUrl" =>
-                 "https://sqs.eu-central-1.amazonaws.com/123456789012/PaywizardQueue.fifo"
+               "QueueUrl" => "https://sqs.eu-central-1.amazonaws.com/123456789012/PaywizardQueue.fifo"
              }
 
       {:ok,
@@ -132,17 +122,12 @@ defmodule UserEventQueueTest do
 
   test "enqueue delete user message" do
     MockHTTPClient
-    |> expect(:request, fn :post,
-                           "https://sqs.eu-central-1.amazonaws.com/",
-                           body,
-                           _headers,
-                           _http_opts ->
+    |> expect(:request, fn :post, "https://sqs.eu-central-1.amazonaws.com/", body, _headers, _http_opts ->
       assert URI.decode_query(body) == %{
                "Action" => "SendMessage",
                "MessageBody" => Jason.encode!(%{type: "delete", data: %{user_id: "123"}}),
                "MessageGroupId" => "123",
-               "QueueUrl" =>
-                 "https://sqs.eu-central-1.amazonaws.com/123456789012/PaywizardQueue.fifo"
+               "QueueUrl" => "https://sqs.eu-central-1.amazonaws.com/123456789012/PaywizardQueue.fifo"
              }
 
       {:ok,
@@ -167,14 +152,9 @@ defmodule UserEventQueueTest do
   describe "poll" do
     test "with an empty queue" do
       MockHTTPClient
-      |> expect(:request, fn :post,
-                             "https://sqs.eu-central-1.amazonaws.com/",
-                             body,
-                             _headers,
-                             _http_opts ->
+      |> expect(:request, fn :post, "https://sqs.eu-central-1.amazonaws.com/", body, _headers, _http_opts ->
         assert URI.decode_query(body) == %{
-                 "QueueUrl" =>
-                   "https://sqs.eu-central-1.amazonaws.com/123456789012/PaywizardQueue.fifo",
+                 "QueueUrl" => "https://sqs.eu-central-1.amazonaws.com/123456789012/PaywizardQueue.fifo",
                  "Action" => "ReceiveMessage",
                  "MaxNumberOfMessages" => "10",
                  "AttributeName.1" => "MessageGroupId"
@@ -199,14 +179,9 @@ defmodule UserEventQueueTest do
 
     test "with a create message" do
       MockHTTPClient
-      |> expect(:request, fn :post,
-                             "https://sqs.eu-central-1.amazonaws.com/",
-                             body,
-                             _headers,
-                             _http_opts ->
+      |> expect(:request, fn :post, "https://sqs.eu-central-1.amazonaws.com/", body, _headers, _http_opts ->
         assert URI.decode_query(body) == %{
-                 "QueueUrl" =>
-                   "https://sqs.eu-central-1.amazonaws.com/123456789012/PaywizardQueue.fifo",
+                 "QueueUrl" => "https://sqs.eu-central-1.amazonaws.com/123456789012/PaywizardQueue.fifo",
                  "Action" => "ReceiveMessage",
                  "MaxNumberOfMessages" => "10",
                  "AttributeName.1" => "MessageGroupId"
@@ -256,14 +231,9 @@ defmodule UserEventQueueTest do
 
     test "with an update message" do
       MockHTTPClient
-      |> expect(:request, fn :post,
-                             "https://sqs.eu-central-1.amazonaws.com/",
-                             body,
-                             _headers,
-                             _http_opts ->
+      |> expect(:request, fn :post, "https://sqs.eu-central-1.amazonaws.com/", body, _headers, _http_opts ->
         assert URI.decode_query(body) == %{
-                 "QueueUrl" =>
-                   "https://sqs.eu-central-1.amazonaws.com/123456789012/PaywizardQueue.fifo",
+                 "QueueUrl" => "https://sqs.eu-central-1.amazonaws.com/123456789012/PaywizardQueue.fifo",
                  "Action" => "ReceiveMessage",
                  "MaxNumberOfMessages" => "10",
                  "AttributeName.1" => "MessageGroupId"
@@ -302,14 +272,9 @@ defmodule UserEventQueueTest do
 
     test "with a delete message" do
       MockHTTPClient
-      |> expect(:request, fn :post,
-                             "https://sqs.eu-central-1.amazonaws.com/",
-                             body,
-                             _headers,
-                             _http_opts ->
+      |> expect(:request, fn :post, "https://sqs.eu-central-1.amazonaws.com/", body, _headers, _http_opts ->
         assert URI.decode_query(body) == %{
-                 "QueueUrl" =>
-                   "https://sqs.eu-central-1.amazonaws.com/123456789012/PaywizardQueue.fifo",
+                 "QueueUrl" => "https://sqs.eu-central-1.amazonaws.com/123456789012/PaywizardQueue.fifo",
                  "Action" => "ReceiveMessage",
                  "MaxNumberOfMessages" => "10",
                  "AttributeName.1" => "MessageGroupId"
@@ -344,14 +309,9 @@ defmodule UserEventQueueTest do
 
     test "with a valid and an invalid message" do
       MockHTTPClient
-      |> expect(:request, fn :post,
-                             "https://sqs.eu-central-1.amazonaws.com/",
-                             body,
-                             _headers,
-                             _http_opts ->
+      |> expect(:request, fn :post, "https://sqs.eu-central-1.amazonaws.com/", body, _headers, _http_opts ->
         assert URI.decode_query(body) == %{
-                 "QueueUrl" =>
-                   "https://sqs.eu-central-1.amazonaws.com/123456789012/PaywizardQueue.fifo",
+                 "QueueUrl" => "https://sqs.eu-central-1.amazonaws.com/123456789012/PaywizardQueue.fifo",
                  "Action" => "ReceiveMessage",
                  "MaxNumberOfMessages" => "10",
                  "AttributeName.1" => "MessageGroupId"
@@ -379,14 +339,9 @@ defmodule UserEventQueueTest do
 
   test "delete message from queue" do
     MockHTTPClient
-    |> expect(:request, fn :post,
-                           "https://sqs.eu-central-1.amazonaws.com/",
-                           body,
-                           _headers,
-                           _http_opts ->
+    |> expect(:request, fn :post, "https://sqs.eu-central-1.amazonaws.com/", body, _headers, _http_opts ->
       assert URI.decode_query(body) == %{
-               "QueueUrl" =>
-                 "https://sqs.eu-central-1.amazonaws.com/123456789012/PaywizardQueue.fifo",
+               "QueueUrl" => "https://sqs.eu-central-1.amazonaws.com/123456789012/PaywizardQueue.fifo",
                "Action" => "DeleteMessage",
                "ReceiptHandle" =>
                  "AQEBdj8hI0xLQzPUAz8gIbJm7yj/jZPU0A84EaWKq9xekGvW+JwCYVOgfJnJNU9iKPEIecLyrlkzC10g7bZQp64ybmuRkPMF2BEpBwz8wUm/oKUCnQFNddEGFg+B/+ZY1yrEGQm5ADHT16uOESh4kQ+2NJH5qTGWj+zrC30KrtAfI0PDXWJ43AVntuX2KorKk7TOYU7Lz5Nw8HkDQVx8ClXveMy7p0xM13274lLjkQcGJam+ztbsQhh6cMAdriqklt1EIowkQAYroHWhKWVJOhxsBm5PG8IvEPIhQ0TuEaLYQ08="
@@ -415,14 +370,9 @@ defmodule UserEventQueueTest do
 
   test "get queue attributes" do
     MockHTTPClient
-    |> expect(:request, fn :post,
-                           "https://sqs.eu-central-1.amazonaws.com/",
-                           body,
-                           _headers,
-                           _http_opts ->
+    |> expect(:request, fn :post, "https://sqs.eu-central-1.amazonaws.com/", body, _headers, _http_opts ->
       assert URI.decode_query(body) == %{
-               "QueueUrl" =>
-                 "https://sqs.eu-central-1.amazonaws.com/123456789012/PaywizardQueue.fifo",
+               "QueueUrl" => "https://sqs.eu-central-1.amazonaws.com/123456789012/PaywizardQueue.fifo",
                "Action" => "GetQueueAttributes",
                "AttributeName.1" => "All"
              }
@@ -460,14 +410,9 @@ defmodule UserEventQueueTest do
 
   test "get dlq attributes" do
     MockHTTPClient
-    |> expect(:request, fn :post,
-                           "https://sqs.eu-central-1.amazonaws.com/",
-                           body,
-                           _headers,
-                           _http_opts ->
+    |> expect(:request, fn :post, "https://sqs.eu-central-1.amazonaws.com/", body, _headers, _http_opts ->
       assert URI.decode_query(body) == %{
-               "QueueUrl" =>
-                 "https://sqs.eu-central-1.amazonaws.com/123456789012/PaywizardDLQ.fifo",
+               "QueueUrl" => "https://sqs.eu-central-1.amazonaws.com/123456789012/PaywizardDLQ.fifo",
                "Action" => "GetQueueAttributes",
                "AttributeName.1" => "All"
              }

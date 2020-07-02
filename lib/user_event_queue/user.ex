@@ -1,4 +1,4 @@
-defmodule UserEvent.User do
+defmodule UserEventQueue.User do
   defstruct [
     :accepted_cmore_terms,
     :accepted_fotbollskanalen_terms,
