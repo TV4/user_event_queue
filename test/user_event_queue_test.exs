@@ -17,8 +17,11 @@ defmodule UserEventQueueTest do
     country_code: "SWE",
     year_of_birth: 1990,
     accepted_cmore_terms: "2018-08-08",
+    accepted_cmore_terms_date: "2018-08-08",
     accepted_play_terms: "2019-10-16",
+    accepted_play_terms_date: "2019-10-16",
     accepted_fotbollskanalen_terms: "2012-12-12",
+    accepted_fotbollskanalen_terms_date: "2012-12-12",
     generic_ads: false,
     no_ads: false,
     cmore_newsletter: false
@@ -34,8 +37,11 @@ defmodule UserEventQueueTest do
                    type: "create",
                    data: %{
                      "accepted_cmore_terms" => "2018-08-08",
+                     "accepted_cmore_terms_date" => "2018-08-08",
                      "accepted_fotbollskanalen_terms" => "2012-12-12",
+                     "accepted_fotbollskanalen_terms_date" => "2012-12-12",
                      "accepted_play_terms" => "2019-10-16",
+                     "accepted_play_terms_date" => "2019-10-16",
                      "cmore_newsletter" => false,
                      "country_code" => "SWE",
                      "email" => "user@host.com",
@@ -82,8 +88,11 @@ defmodule UserEventQueueTest do
                    type: "update",
                    data: %{
                      "accepted_cmore_terms" => "2018-08-08",
+                     "accepted_cmore_terms_date" => "2018-08-08",
                      "accepted_fotbollskanalen_terms" => "2012-12-12",
+                     "accepted_fotbollskanalen_terms_date" => "2012-12-12",
                      "accepted_play_terms" => "2019-10-16",
+                     "accepted_play_terms_date" => "2019-10-16",
                      "cmore_newsletter" => false,
                      "country_code" => "SWE",
                      "email" => "user@host.com",
@@ -190,7 +199,7 @@ defmodule UserEventQueueTest do
         {:ok,
          %{
            body:
-             "<?xml version=\"1.0\"?><ReceiveMessageResponse xmlns=\"http://queue.amazonaws.com/doc/2012-11-05/\"><ReceiveMessageResult><Message><MessageId>32542295-1642-40b8-a7ff-f448b20b096a</MessageId><ReceiptHandle>AQEBdj8hI0xLQzPUAz8gIbJm7yj/jZPU0A84EaWKq9xekGvW+JwCYVOgfJnJNU9iKPEIecLyrlkzC10g7bZQp64ybmuRkPMF2BEpBwz8wUm/oKUCnQFNddEGFg+B/+ZY1yrEGQm5ADHT16uOESh4kQ+2NJH5qTGWj+zrC30KrtAfI0PDXWJ43AVntuX2KorKk7TOYU7Lz5Nw8HkDQVx8ClXveMy7p0xM13274lLjkQcGJam+ztbsQhh6cMAdriqklt1EIowkQAYroHWhKWVJOhxsBm5PG8IvEPIhQ0TuEaLYQ08=</ReceiptHandle><MD5OfBody>8f07143838000dec8feba6987e855741</MD5OfBody><Body>{&quot;data&quot;:{&quot;accepted_cmore_terms&quot;:&quot;2018-08-08&quot;,&quot;accepted_fotbollskanalen_terms&quot;:&quot;2012-12-12&quot;,&quot;accepted_play_terms&quot;:&quot;2019-10-16&quot;,&quot;cmore_newsletter&quot;:false,&quot;country_code&quot;:&quot;SWE&quot;,&quot;email&quot;:&quot;user@host.com&quot;,&quot;first_name&quot;:&quot;user&quot;,&quot;generic_ads&quot;:false,&quot;last_name&quot;:&quot;test&quot;,&quot;no_ads&quot;:false,&quot;user_id&quot;:&quot;1234&quot;,&quot;username&quot;:&quot;username&quot;,&quot;year_of_birth&quot;:1990,&quot;zip_code&quot;:&quot;12345&quot;},&quot;type&quot;:&quot;create&quot;}</Body><Attribute><Name>MessageGroupId</Name><Value>1234</Value></Attribute></Message></ReceiveMessageResult><ResponseMetadata><RequestId>b562c8fd-7224-5264-a90b-9ecf60d70837</RequestId></ResponseMetadata></ReceiveMessageResponse>",
+             "<?xml version=\"1.0\"?><ReceiveMessageResponse xmlns=\"http://queue.amazonaws.com/doc/2012-11-05/\"><ReceiveMessageResult><Message><MessageId>32542295-1642-40b8-a7ff-f448b20b096a</MessageId><ReceiptHandle>AQEBdj8hI0xLQzPUAz8gIbJm7yj/jZPU0A84EaWKq9xekGvW+JwCYVOgfJnJNU9iKPEIecLyrlkzC10g7bZQp64ybmuRkPMF2BEpBwz8wUm/oKUCnQFNddEGFg+B/+ZY1yrEGQm5ADHT16uOESh4kQ+2NJH5qTGWj+zrC30KrtAfI0PDXWJ43AVntuX2KorKk7TOYU7Lz5Nw8HkDQVx8ClXveMy7p0xM13274lLjkQcGJam+ztbsQhh6cMAdriqklt1EIowkQAYroHWhKWVJOhxsBm5PG8IvEPIhQ0TuEaLYQ08=</ReceiptHandle><MD5OfBody>8f07143838000dec8feba6987e855741</MD5OfBody><Body>{&quot;data&quot;:{&quot;accepted_cmore_terms&quot;:&quot;2018-08-08&quot;,&quot;accepted_cmore_terms_date&quot;:&quot;2018-08-08&quot;,&quot;accepted_fotbollskanalen_terms&quot;:&quot;2012-12-12&quot;,&quot;accepted_play_terms&quot;:&quot;2019-10-16&quot;,&quot;cmore_newsletter&quot;:false,&quot;country_code&quot;:&quot;SWE&quot;,&quot;email&quot;:&quot;user@host.com&quot;,&quot;first_name&quot;:&quot;user&quot;,&quot;generic_ads&quot;:false,&quot;last_name&quot;:&quot;test&quot;,&quot;no_ads&quot;:false,&quot;user_id&quot;:&quot;1234&quot;,&quot;username&quot;:&quot;username&quot;,&quot;year_of_birth&quot;:1990,&quot;zip_code&quot;:&quot;12345&quot;},&quot;type&quot;:&quot;create&quot;}</Body><Attribute><Name>MessageGroupId</Name><Value>1234</Value></Attribute></Message></ReceiveMessageResult><ResponseMetadata><RequestId>b562c8fd-7224-5264-a90b-9ecf60d70837</RequestId></ResponseMetadata></ReceiveMessageResponse>",
            headers: [
              {"x-amzn-RequestId", "b562c8fd-7224-5264-a90b-9ecf60d70837"},
              {"Date", "Tue, 29 Oct 2019 10:13:07 GMT"},
@@ -208,6 +217,7 @@ defmodule UserEventQueueTest do
                           message_group_id: 1234,
                           data: %User{
                             accepted_cmore_terms: "2018-08-08",
+                            accepted_cmore_terms_date: "2018-08-08",
                             accepted_fotbollskanalen_terms: "2012-12-12",
                             accepted_play_terms: "2019-10-16",
                             cmore_newsletter: false,

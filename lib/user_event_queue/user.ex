@@ -1,8 +1,11 @@
 defmodule UserEventQueue.User do
   defstruct [
     :accepted_cmore_terms,
+    :accepted_cmore_terms_date,
     :accepted_fotbollskanalen_terms,
+    :accepted_fotbollskanalen_terms_date,
     :accepted_play_terms,
+    :accepted_play_terms_date,
     :cmore_newsletter,
     :country_code,
     :email,
