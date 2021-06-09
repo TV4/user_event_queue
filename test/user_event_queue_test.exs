@@ -214,7 +214,8 @@ defmodule UserEventQueueTest do
                assert UserEventQueue.poll() == [
                         %Event{
                           type: :create,
-                          message_group_id: 1234,
+                          message_id: "32542295-1642-40b8-a7ff-f448b20b096a",
+                          message_group_id: "1234",
                           data: %User{
                             accepted_cmore_terms: "2018-08-08",
                             accepted_cmore_terms_date: "2018-08-08",
@@ -267,7 +268,8 @@ defmodule UserEventQueueTest do
                assert UserEventQueue.poll() == [
                         %Event{
                           type: :update,
-                          message_group_id: 1234,
+                          message_id: "32542295-1642-40b8-a7ff-f448b20b096a",
+                          message_group_id: "1234",
                           data: %User{
                             user_id: "1234",
                             username: "username",
@@ -308,7 +310,8 @@ defmodule UserEventQueueTest do
                assert UserEventQueue.poll() == [
                         %Event{
                           type: :delete,
-                          message_group_id: 1234,
+                          message_id: "32542295-1642-40b8-a7ff-f448b20b096a",
+                          message_group_id: "1234",
                           data: %User{user_id: "1234"},
                           receipt_handle:
                             "AQEBdj8hI0xLQzPUAz8gIbJm7yj/jZPU0A84EaWKq9xekGvW+JwCYVOgfJnJNU9iKPEIecLyrlkzC10g7bZQp64ybmuRkPMF2BEpBwz8wUm/oKUCnQFNddEGFg+B/+ZY1yrEGQm5ADHT16uOESh4kQ+2NJH5qTGWj+zrC30KrtAfI0PDXWJ43AVntuX2KorKk7TOYU7Lz5Nw8HkDQVx8ClXveMy7p0xM13274lLjkQcGJam+ztbsQhh6cMAdriqklt1EIowkQAYroHWhKWVJOhxsBm5PG8IvEPIhQ0TuEaLYQ08="

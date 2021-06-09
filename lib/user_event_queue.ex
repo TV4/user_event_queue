@@ -60,6 +60,7 @@ defmodule UserEventQueue do
     |> Enum.map(fn %{
                      body: body,
                      receipt_handle: receipt_handle,
+                     message_id: message_id,
                      attributes: %{"message_group_id" => message_group_id}
                    } ->
       case Jason.decode(body) do
@@ -68,6 +69,7 @@ defmodule UserEventQueue do
             type: String.to_atom(type),
             data: User.parse(data),
             receipt_handle: receipt_handle,
+            message_id: message_id,
             message_group_id: message_group_id
           }
 
