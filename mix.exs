@@ -5,7 +5,7 @@ defmodule UserEvent.MixProject do
     [
       app: :user_event_queue,
       version: "0.1.0",
-      elixir: "~> 1.10",
+      elixir: "~> 1.12",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       deps: deps(),
